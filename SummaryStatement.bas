@@ -7,7 +7,6 @@ Sub GetProductsSet()
     
     'Get data workbook
     If filePath = "" Then
-        MsgBox "Nie wybrano, lub wybrano niewspierany plik"
         Exit Sub
     End If
     
@@ -33,9 +32,17 @@ Sub GetProductsSet()
         'Debug.Print "LastDataRow    = " & LastDataRow
     
     'Scrap data
+    Dim ProductName As String
+    Dim ProductQuantity As Integer
+    Dim ProductId As String
+    
     Dim i As Integer
     For i = FirstDataRow To LastDataRow
-        AddProductToList (wsZamowienia.Cells(i, 17).Value)
+        ProductName = wsZamowienia.Cells(i, 17).Value
+        ProductId = wsZamowienia.Cells(i, 25).Value
+        ProductQuantity = wsZamowienia.Cells(i, 19).Value
+        Call AddProductToList(ProductName, ProductId, ProductQuantity)
+        
     Next i
     
     wb.Close
@@ -56,7 +63,7 @@ Private Function GetLastRow(WsCol As Worksheet, colNb As Integer) As Integer
     
 End Function
 
-Private Sub AddProductToList(Prod As String)
+Private Sub AddProductToList(Prod As String, ProdId As String, ProdQuantity As Integer)
     Dim wb As Workbook
     Set wb = Workbooks("ZestawienieIlosciowe.xlsm")
     Dim ProductListStart As Integer
@@ -65,15 +72,16 @@ Private Sub AddProductToList(Prod As String)
     ProductListEnd = GetLastRow(wb.Worksheets("Sheet1"), 1)
     Dim i As Integer
     For i = ProductListStart To ProductListEnd
-        If wb.Worksheets("Sheet1").Cells(i, 1).Value = Prod Then
-            wb.Worksheets("Sheet1").Cells(i, 2).Value = wb.Worksheets("Sheet1").Cells(i, 2).Value + 1
+        If wb.Worksheets("Sheet1").Cells(i, 2).Value = ProdId Then
+            wb.Worksheets("Sheet1").Cells(i, 3).Value = wb.Worksheets("Sheet1").Cells(i, 3).Value + ProdQuantity
             Exit Sub
         End If
     Next i
     Dim nextRow As Integer
     nextRow = FindLastEmptyRow(wb.Worksheets("Sheet1"), 1)
     wb.Worksheets("Sheet1").Cells(nextRow, 1).Value = Prod
-    wb.Worksheets("Sheet1").Cells(nextRow, 2).Value = 1
+    wb.Worksheets("Sheet1").Cells(nextRow, 2).Value = ProdId
+    wb.Worksheets("Sheet1").Cells(nextRow, 3).Value = ProdQuantity
     
 End Sub
 
@@ -102,6 +110,7 @@ Sub Clean()
     For i = FirstDataRow To LastDataRow
         ActiveWorkbook.Worksheets("Sheet1").Cells(i, 1).ClearContents
         ActiveWorkbook.Worksheets("Sheet1").Cells(i, 2).ClearContents
+        ActiveWorkbook.Worksheets("Sheet1").Cells(i, 3).ClearContents
     Next i
     
 End Sub

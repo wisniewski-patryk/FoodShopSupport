@@ -6,7 +6,6 @@ Sub ListaZakupow()
     
     'Get data workbook
     If fpZestawienieIlosciowe = "" Then
-        MsgBox "Nie wybrano lub wybrano niewspierany plik"
         Exit Sub
     End If
     
@@ -43,6 +42,7 @@ Sub ListaZakupow()
     
     'scrap data
     Dim Product As String
+    Dim ProductId As String
     Dim ProductToAdd As String
     Dim ProductQuantity As Integer
     Dim PrducctQuantityToAdd As Integer
@@ -55,29 +55,20 @@ Sub ListaZakupow()
     
     For i = FirstDataRow To LastDataRow
         Product = wsZestawienieIlosciowe.Cells(i, 1)
-        ProductQuantity = wsZestawienieIlosciowe.Cells(i, 2)
-        
-        Debug.Print "Product= " & Product
-        Debug.Print "ProductQuantity= " & ProductQuantity
+        ProductId = wsZestawienieIlosciowe.Cells(i, 2)
+        ProductQuantity = wsZestawienieIlosciowe.Cells(i, 3)
         
         For dbElement = dbStart To dbEnd
-            Debug.Print wsDb.Cells(dbElement, 1)
-            If Product = wsDb.Cells(dbElement, 1) Then
+            If ProductId = wsDb.Cells(dbElement, 2) Then
                 ProductToAdd = wsDb.Cells(dbElement, 3)
-                    Debug.Print "ProductToAdd= " & ProductToAdd
                 PrducctQuantityToAdd = ProductQuantity * wsDb.Cells(dbElement, 5).Value
-                    Debug.Print "PrducctQuantityToAdd=" & PrducctQuantityToAdd
                 ProductWeightToAdd = ProductQuantity * wsDb.Cells(dbElement, 6).Value
-                    Debug.Print "ProductWeightToAdd= " & ProductWeightToAdd
                 
                 Call AddToList(ProductToAdd, PrducctQuantityToAdd, ProductWeightToAdd)
                 
             End If
             
         Next dbElement
-        
-        
-        
         
     Next i
     
@@ -92,8 +83,8 @@ Private Function GetFile() As String
     Set fileDialog = Application.fileDialog(msoFileDialogFilePicker)
     fileDialog.AllowMultiSelect = False
     fileDialog.InitialFileName = "C:\Users\wisniewski-patryk\AppData\Local\obsidian-vaults\wisniewski-patryk\_PRIVATE\FUCHY\Sklep\"
-    fileDialog.Filters.Add "Excel file", "*.xlsx"
     fileDialog.Filters.Add "Excel file with Macros", "*.xlsm"
+    fileDialog.Filters.Add "Excel file", "*.xlsx"
     fileDialog.Filters.Add "All files", "*.*"
     If fileDialog.Show = -1 Then
         GetFile = fileDialog.SelectedItems(1)

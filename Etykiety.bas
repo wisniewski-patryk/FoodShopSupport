@@ -57,7 +57,7 @@ Sub MakeLabels()
     Dim Recycling As String         'row 45 - 'AS' 1 = N ; 0 = T
     Dim PaymentMethod As String     'row 5  - 'E'
     
-    Dim ProductName As String       'row 18 - 'R'
+    Dim ProductName As String       'row 18 - 'R' -> zmiana na col 25 'Y'
     Dim ProductQuantity As Integer  'row 19 - 'S'
     
     Dim ProductOffsetRow, ProductOffsetColumn As Integer
@@ -70,7 +70,7 @@ Sub MakeLabels()
     For i = FirstDataRowInOrders To LastDataRowInOrders
     
         'making new sheet
-        If (LabelRow = -1) Or (LabelRow = 7) Then
+        If (LabelRow = -1) Then
             LabelsPage = LabelsPage + wbLabels.Worksheets.Count
             newLabelsSetName = "Labels " & LabelsPage
             NewLabelsSet (newLabelsSetName)
@@ -100,7 +100,11 @@ Sub MakeLabels()
             ColTemp = 1 + (6 * LabelColumn)
             
             wsLabels.Cells(RowTemp, ColTemp).Select
-            Selection.Offset(5, 1) = PaymentMethod
+            If PaymentMethod = "Cash on delivery" Or PaymentMethod = "P?atno?? przy odbiorze" Then
+                Selection.Offset(5, 1) = "Przy odbiorze"
+            Else
+                Selection.Offset(5, 1) = PaymentMethod
+            End If
             Selection.Offset(6, 0) = ClientName
             Selection.Offset(6, 2) = ClientPhone
             Selection.Offset(7, 0) = ClientAdress
@@ -121,7 +125,7 @@ Sub MakeLabels()
             
         End If
                 
-        ProductName = wsOrders.Cells(i, 18)
+        ProductName = wsOrders.Cells(i, 25)
         ProductQuantity = wsOrders.Cells(i, 19)
         
         Selection.Offset(ProductOffsetRow, ProductOffsetColumn) = ProductName
@@ -136,6 +140,7 @@ Sub MakeLabels()
         
         
     Next i
+   wb.Close
    
 End Sub
 Private Function GetFile() As String
